@@ -490,8 +490,9 @@
             <!-- card-extra-rounded を適用し、p-5をp-4に削減 -->
             <div class="lg:col-span-3 h-full flex flex-col">
                 
-                <!-- ✅ 修正箇所 1: AIサービス公式サイトリンクを上部に移動 -->
-                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-accent/50 lg:sticky lg:top-4 mb-4">
+                <!-- ✅ 修正 1: 公式サイトリンクの固定 (sticky) を解除 -->
+                <!-- ✅ 修正 2: `lg:sticky lg:top-4 mb-4` を削除し、通常のフローに戻す -->
+                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-accent/50 mb-4">
                     <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-accent/50 pb-1">主要AIサービス 公式サイト</h2>
                     <p class="text-xs text-text/80 mb-4">作成したプロンプトはこちらのサービスでご利用いただけます。</p>
                     <div class="space-y-3">
@@ -503,12 +504,12 @@
                         </a>
                     </div>
                 </div>
-                <!-- /修正箇所 1 -->
+                <!-- /修正 1 -->
 
-                <!-- アフィリエイトリンクブロック (下部に移動) -->
+                <!-- アフィリエイトリンクブロック -->
                 <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-primary/50">
+                    <!-- ✅ 修正 2: 「推し活に役立つ情報」のタイトルを削除 -->
                     <div class="text-center">
-                        <!-- text-sm を text-xs に変更 -->
                         <p class="text-xs font-bold text-primary/80 mb-3">【関連サービス・スポンサーリンク】</p>
                         <!-- 広告コード -->
 <a href="https://px.a8.net/svt/ejp?a8mat=45G2TO+FHBA2+2PEO+661TT" rel="nofollow">
