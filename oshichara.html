@@ -316,15 +316,15 @@
 
                     <!-- ユーザーとの関係 (必須) -->
                     <div class="mb-4">
-                        <label for="relationship" class="block text-sm font-bold text-text">AIから見たユーザーとの関係 <span class="text-red-500">*</span></label>
+                        <label for="relationship" class="block text-sm font-bold text-text">あなたとの関係 <span class="text-red-500">*</span></label>
                         <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
                             <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
                             <option value="親友">親友（一番の友達）</option>
-                            <option value="家族（親）">家族（父/母）</option>
-                            <option value="家族（兄/姉）">家族（兄/姉）</option>
-                            <option value="家族（弟/妹）">家族（弟/妹）</option>
-                            <option value="上司">上司</option>
+                            <option value="家族（AIがユーザーの親）">あなたの親</option>
+                            <option value="家族（AIがユーザーの兄/姉）">あなたの兄/姉</option>
+                            <option value="家族（AIがユーザーの弟/妹）">あなたの弟/妹</option>
+                            <option value="上司">あなたの上司</option>
                             <option value="幼馴染">幼馴染</option>
                             <option value="推しとファン">推しとファン</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
@@ -336,7 +336,7 @@
                     <div class="mb-4">
                         <label for="userNickname" class="block text-sm font-bold text-text">AIがユーザーを呼ぶ名 <span class="text-red-500">*</span></label>
                         <p class="text-2xs text-text/70 mb-1">（例: 「相棒」「ハニー」など、AIがユーザーを呼ぶ時の名前を直接入力してください）</p>
-                        <input type="text" id="userNickname" value="" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 呼び捨て, 〇〇ちゃん/くん, ハニー">
+                        <input type="text" id="userNickname" value="" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 〇〇ちゃん/くん, ハニー">
                     </div>
                     
                     <h2 class="text-xl font-bold text-primary my-4 border-b-2 border-primary/50 pb-1">3. 利用目的と形式</h2>
