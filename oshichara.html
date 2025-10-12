@@ -165,7 +165,7 @@
             prompt += "\n";
 
             // 2.2. ユーザー情報と役割
-            prompt += `## 2. ユーザーとの関係\n`;
+            prompt += `## 2. あなたとの関係\n`; // 修正
             prompt += `- **ユーザーの推定性別**: ${userGender}\n`; 
             prompt += `- **AIから見たユーザーとの関係**: ${name}にとってユーザーは「${relationship}」です。\n`;
             prompt += `- **ユーザーの呼び名**: ユーザーを「${userNickname}」と呼んでください。\n`;
@@ -342,7 +342,7 @@
                         <p class="text-2xs text-red-500 mt-1 font-bold">⚠️ 実在の人物のWikipediaなど、プライバシーに関わるURLは拒否される場合があります。</p>
                     </div>
                     
-                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. ユーザーとの関係</h2>
+                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. あなたとの関係</h2>
                     
                     <!-- ユーザーの性別 -->
                     <div class="mb-3">
@@ -365,11 +365,15 @@
                         <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
                             <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
-                            <option value="親友">親友</option>
+                            <option value="親友">親友（一番の友達）</option>
+                            <!-- ✅ 修正: AIがユーザーの親 -> あなたの親 -->
                             <option value="家族（AIがユーザーの親）">あなたの親</option>
+                            <!-- ✅ 修正: AIがユーザーの兄/姉 -> あなたの兄/姉 -->
                             <option value="家族（AIがユーザーの兄/姉）">あなたの兄/姉</option>
+                            <!-- ✅ 修正: AIがユーザーの弟/妹 -> あなたの弟/妹 -->
                             <option value="家族（AIがユーザーの弟/妹）">あなたの弟/妹</option>
-                            <option value="上司">上司</option>
+                            <!-- ✅ 修正: 上司 -> あなたの上司 -->
+                            <option value="上司">あなたの上司</option>
                             <option value="幼馴染">幼馴染</option>
                             <option value="推しとファン">推しとファン</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
@@ -500,6 +504,20 @@
                             <img border="0" width="336" height="280" alt="AIツールの使い方やプロンプト生成を学べるオンライン講座" src="https://www27.a8.net/svt/bgt?aid=251012938012&wid=002&eno=01&mid=s00000012789001021000&mc=1">
                         </a>
                         <img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=45G2TM+758T6+2QOI+62U35" alt="" class="hidden">
+                    </div>
+                </div>
+
+                <!-- ✅ 修正箇所: AIサービス公式サイトリンクの追加 -->
+                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-accent/50 mt-4">
+                    <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-accent/50 pb-1">主要AIサービス 公式サイト</h2>
+                    <p class="text-xs text-text/80 mb-4">作成したプロンプトはこちらのサービスでご利用いただけます。</p>
+                    <div class="space-y-3">
+                        <a href="https://chat.openai.com/gpts" target="_blank" class="block text-center px-4 py-3 bg-accent text-text font-bold rounded-full shadow-md hover:opacity-80 transition duration-200 text-sm">
+                            🤖 ChatGPT (GPTs) を開く
+                        </a>
+                        <a href="https://gemini.google.com/app" target="_blank" class="block text-center px-4 py-3 bg-accent text-text font-bold rounded-full shadow-md hover:opacity-80 transition duration-200 text-sm">
+                            ✨ Gemini Advanced を開く
+                        </a>
                     </div>
                 </div>
                 
