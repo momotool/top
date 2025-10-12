@@ -61,6 +61,8 @@
                         'secondary': '#fbcfe8', // Soft Pink for borders
                         'accent': '#a8e0a8', // Mint Green (Leaf)
                         'text': '#4a4a4a', // Soft Dark Text
+                        'danger': '#ef4444', // Red 500
+                        'danger-dark': '#b91c1c', // Red 700
                     }
                 }
             }
@@ -82,7 +84,7 @@
                 customInputElement.classList.add('hidden');
                 customInputElement.required = false;
             }
-            // セレクトボックスの値が変わったら、プロンプトを再生成
+            // セレクトボックスの値が変わったら、プロンプトを再生成 (自動生成を維持)
             generatePrompt();
         }
 
@@ -130,6 +132,7 @@
 
             const outputElement = document.getElementById('promptOutput');
             const copyButton = document.getElementById('copyButton');
+            const generateButton = document.getElementById('generateButton'); // 追加
 
             // 必須チェック
             const isSelectDefault = (id) => document.getElementById(id).value === '';
@@ -138,6 +141,7 @@
                 // エラーメッセージを修正
                 outputElement.value = "🚨 【プロンプトが出ない場合】\n\n「*印」のついた必須項目（特に一人称、関係、利用目的、信念、返答形式のドロップダウン）が、選択されていません。\n\n必ず選択肢を一つ選ぶか、「その他（自由入力）」を選んでテキストを入力してください。";
                 copyButton.disabled = true;
+                generateButton.disabled = true; // 追加
                 return;
             }
 
@@ -190,6 +194,7 @@
             // 3. 結果の表示
             outputElement.value = prompt;
             copyButton.disabled = false;
+            generateButton.disabled = false; // 追加
 
             // コピーボタンのテキストをリセット
             copyButton.textContent = '📋 プロンプトをコピー';
@@ -208,6 +213,18 @@
             setTimeout(() => {
                 copyButton.textContent = '📋 プロンプトをコピー';
             }, 3000);
+        }
+
+        // フォームのリセットと初期プロンプト生成
+        function resetForm() {
+            document.getElementById('promptForm').reset();
+            // カスタム入力欄を非表示に戻す
+            document.getElementById('customSelfReference').classList.add('hidden');
+            document.getElementById('customRelationship').classList.add('hidden');
+            document.getElementById('customPurpose').classList.add('hidden');
+            document.getElementById('customBelief').classList.add('hidden');
+            // リセット後、初期プロンプトを再生成
+            generatePrompt();
         }
 
         // 初期化時にプロンプトを生成
@@ -343,16 +360,16 @@
                     <!-- ユーザーとの関係 (必須) -->
                     <div class="mb-3">
                         <!-- text-sm を text-xs に変更 -->
-                        <label for="relationship" class="block text-xs font-bold text-text">AIから見たユーザーとの関係 <span class="text-red-500">*</span></label>
+                        <label for="relationship" class="block text-xs font-bold text-text">あなたとの関係 <span class="text-red-500">*</span></label>
                         <!-- text-base を text-sm に変更し、p-2をp-1.5に削減 -->
                         <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
                             <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
-                            <option value="親友">親友（一番の友達）</option>
+                            <option value="親友">親友</option>
                             <option value="家族（AIがユーザーの親）">あなたの親</option>
                             <option value="家族（AIがユーザーの兄/姉）">あなたの兄/姉</option>
                             <option value="家族（AIがユーザーの弟/妹）">あなたの弟/妹</option>
-                            <option value="上司">あなたの上司</option>
+                            <option value="上司">上司</option>
                             <option value="幼馴染">幼馴染</option>
                             <option value="推しとファン">推しとファン</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
@@ -418,6 +435,19 @@
                     </div>
 
                 </form>
+
+                <!-- ✅ 修正箇所: ボタンエリアの追加 -->
+                <div class="mt-4 flex justify-between space-x-2 pt-4 border-t border-secondary">
+                    <!-- リセットボタン -->
+                    <button onclick="resetForm()" class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-danger rounded-full shadow-md hover:bg-danger-dark transition duration-200">
+                        🔄 入力内容をクリア
+                    </button>
+                    <!-- プロンプト再生成ボタン -->
+                    <button id="generateButton" onclick="generatePrompt()" disabled class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-primary rounded-full shadow-md hover:opacity-80 transition duration-200 disabled:bg-gray-400">
+                        ✏️ プロンプトを作成
+                    </button>
+                </div>
+                <!-- /修正箇所 -->
             </div>
             
             <!-- COLUMN 2: 利用方法の解説とプロンプト出力エリア (4/10幅) -->
@@ -457,6 +487,7 @@
             <div class="lg:col-span-3 h-full flex flex-col">
                 
                 <!-- アフィリエイトリンクブロック -->
+                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-primary/50 lg:sticky lg:top-4">
                     <div class="text-center">
                         <!-- text-sm を text-xs に変更 -->
                         <p class="text-xs font-bold text-primary/80 mb-3">【関連サービス・スポンサーリンク】</p>
