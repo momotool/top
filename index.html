@@ -4,38 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ももつーる - あなたの活動を加速する便利ツール集</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Zen Kaku Gothic New (丸みのあるフォント) --><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* フォントとベースカラー */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fb; /* 非常に明るい背景 */
+            font-family: 'Zen Kaku Gothic New', sans-serif; /* 丸みのあるフォント */
+            background-color: #fffaf0; /* 非常に明るいクリーム色 (桃の産毛のようなイメージ) */
+            color: #4a4a4a; /* 少し柔らかい黒色 */
         }
-        /* カスタムカラーパレット */
-        .primary-bg { background-color: #7c3aed; } /* Violet 600 */
-        .primary-text { color: #7c3aed; }
-        .accent-bg { background-color: #fde68a; } /* Amber 200 */
-        .shadow-custom { box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -2px rgba(124, 58, 237, 0.05); }
+        /* カスタムカラーパレット - 桃をテーマに */
+        .primary-bg { background-color: #ff6b81; } /* 桃色 */
+        .primary-text { color: #ff6b81; } /* 桃色 */
+        .accent-bg { background-color: #a8e0a8; } /* ミントグリーン (葉っぱのイメージ) */
+        .accent-text { color: #a8e0a8; }
+
+        .shadow-custom { 
+            box-shadow: 0 10px 15px -3px rgba(255, 107, 129, 0.2), 
+                        0 4px 6px -2px rgba(255, 107, 129, 0.1); 
+        }
         /* ボタンアニメーション */
         .btn-primary {
             transition: all 0.3s ease;
-            box-shadow: 0 4px #4c1d95; /* Darker Violet for 3D effect */
+            box-shadow: 0 4px #e05e71; /* 少し濃い桃色で3D効果 */
+            border-radius: 9999px; /* より丸みを帯びたボタン */
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px #4c1d95;
+            box-shadow: 0 6px #e05e71;
         }
         .btn-primary:active {
             transform: translateY(2px);
-            box-shadow: 0 2px #4c1d95;
+            box-shadow: 0 2px #e05e71;
+        }
+        /* カードの角を丸く */
+        .card-rounded {
+            border-radius: 1.5rem; /* より大きな丸み */
+        }
+
+        /* アフィリエイトバナーのセンタリングとモバイルでの非表示/縮小対応 */
+        .affiliate-banner-wrapper {
+            text-align: center;
+            margin-bottom: 2.5rem; /* mb-10 */
+        }
+        .affiliate-banner-pc {
+            display: inline-block;
+        }
+        /* モバイルでの幅の広いバナーを非表示 (任意で調整) */
+        @media (max-width: 768px) {
+            .affiliate-banner-pc {
+                display: none;
+            }
         }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- ヘッダー -->
-    <header class="primary-bg text-white shadow-xl">
+    <!-- ヘッダー --><header class="primary-bg text-white shadow-xl">
         <div class="max-w-6xl mx-auto p-4 md:p-6 flex justify-between items-center">
             <h1 class="text-3xl font-extrabold tracking-tight">ももつーる</h1>
             <nav>
@@ -44,65 +69,53 @@
         </div>
     </header>
 
-    <!-- ヒーローセクション -->
-    <section class="text-center py-16 md:py-24 bg-white shadow-lg mb-12">
+    <!-- ヒーローセクション --><section class="text-center py-16 md:py-24 bg-white shadow-lg mb-12 card-rounded">
         <div class="max-w-4xl mx-auto px-4">
             <h2 class="text-4xl md:text-5xl font-extrabold mb-4 primary-text">
-                あなたの活動を加速する<br class="md:hidden">便利ツール集
+                <span class="text-5xl md:text-6xl">🍑</span> あなたの活動を加速する<br class="md:hidden">便利ツール集
             </h2>
             <p class="text-xl text-gray-600 mb-8">
                 業務、趣味、クリエイティブ活動をサポートする、便利なツールをご紹介します。
             </p>
-            <a href="#tools" class="inline-block px-8 py-3 text-lg font-bold rounded-full text-white primary-bg btn-primary">
-                今すぐツールを見る
+            <a href="#tools" class="inline-block px-8 py-3 text-lg font-bold text-white primary-bg btn-primary">
+                今すぐツールを見る <span class="ml-2">✨</span>
             </a>
         </div>
     </section>
 
-    <!-- ツール一覧セクション -->
-    <section id="tools" class="max-w-6xl mx-auto px-4 py-12">
+    <!-- ツール一覧セクション --><section id="tools" class="max-w-6xl mx-auto px-4 py-12">
         <h3 class="text-3xl font-bold primary-text mb-8 border-b-4 border-accent-bg inline-block pb-1">
             最新ツール一覧
         </h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- アフィリエイトバナー --><div class="affiliate-banner-wrapper">
+            <a href="https://px.a8.net/svt/ejp?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" rel="nofollow" class="affiliate-banner-pc">
+                <img border="0" width="728" height="90" alt="関連AIサービス" src="https://www24.a8.net/svt/bgt?aid=210206129614&wid=002&eno=01&mid=s00000008903001070000&mc=1">
+            </a>
+            <img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" alt="" class="hidden">
+            
+            <!-- モバイル用バナー (PC用が非表示の時に表示) --><a href="https://px.a8.net/svt/ejp?a8mat=45G2TN+805UCA+515E+5ZEMP" rel="nofollow" class="md:hidden inline-block">
+                <img border="0" width="320" height="50" alt="関連AIサービス" src="https://www20.a8.net/svt/bgt?aid=251012939484&wid=002&eno=01&mid=s00000023477001005000&mc=1">
+            </a>
+            <img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=45G2TN+805UCA+515E+5ZEMP" alt="" class="hidden md:hidden">
+        </div>
+        <!-- /アフィリエイトバナー --><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            <!-- ツールカード 1: 推しAIプロンプトメーカー -->
-            <div class="bg-white p-6 rounded-xl shadow-custom border-t-8 border-primary-bg transition hover:shadow-2xl hover:scale-[1.02] duration-300">
-                <div class="text-3xl mb-4">💖</div>
-                <h4 class="text-xl font-extrabold mb-2 text-gray-900">推しキャラがAIに！プロンプトメーカー</h4>
+            <!-- ツールカード 1: 推しAIプロンプトメーカー --><div class="bg-white p-6 card-rounded shadow-custom border-t-8 border-primary-bg transition hover:shadow-2xl hover:scale-[1.02] duration-300">
+                <div class="text-3xl mb-4">✨</div> <!-- 桃色と合うきらめき絵文字 --><h4 class="text-xl font-extrabold mb-2 text-gray-900">推しキャラがAIに！プロンプトメーカー</h4>
                 <p class="text-gray-600 mb-4 text-sm">
                     特定の口調や性格をAIに完璧に再現させるための設定文（プロンプト）を自動生成。趣味の推し活から、ユニークな業務ボット作成まで幅広く使えます。
                 </p>
                 
-                <!-- === ツールへのリンクエリア (必須) === -->
-                <!-- ツールへの直接リンクを貼る場合は、href="#"をツールのURLに変更してください。 -->
-                <a href="http://momotool.com/oshichara.html" class="block w-full text-center px-4 py-2 font-bold rounded-lg text-white primary-bg btn-primary mb-3">
-                    ツールを試す
+                <!-- === ツールへのリンクエリア (必須) === --><a href="http://momotool.com/oshichara.html" class="block w-full text-center px-4 py-2 font-bold text-white primary-bg btn-primary">
+                    ツールを試す <span class="ml-1">▶️</span>
                 </a>
-                <!-- =============================== -->
-
-
-                <!-- === アフィリエイトリンクエリア (オプション) === -->
-                <!-- アフィリエイトリンクを貼る場合は、下のコメントアウトを外してご利用ください。 -->
-               <a href="https://px.a8.net/svt/ejp?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" rel="nofollow">
-<img border="0" width="728" height="90" alt="" src="https://www24.a8.net/svt/bgt?aid=210206129614&wid=002&eno=01&mid=s00000008903001070000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" alt="">
-                <a href="https://px.a8.net/svt/ejp?a8mat=45G2TN+805UCA+515E+5ZEMP" rel="nofollow">
-<img border="0" width="320" height="50" alt="" src="https://www20.a8.net/svt/bgt?aid=251012939484&wid=002&eno=01&mid=s00000023477001005000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=45G2TN+805UCA+515E+5ZEMP" alt="">
-                    関連AIサービス
-                </a> -->
-                <!-- ============================================== -->
-            </div>
+                <!-- =============================== --></div>
             
-            <!-- 今後のツール追加はここにカードブロックを追加してください -->
-
-        </div>
+            <!-- 今後のツール追加はここにカードブロックを追加してください --></div>
     </section>
 
-    <!-- フッター -->
-    <footer class="bg-gray-800 text-white mt-12 py-8">
+    <!-- フッター --><footer class="bg-gray-800 text-white mt-12 py-8">
         <div class="max-w-6xl mx-auto px-4 text-center text-sm">
             <p class="mb-0">&copy; 2025 ももつーる (momotool.com). All rights reserved.</p>
         </div>
