@@ -6,34 +6,38 @@
     <title>推しAI ペルソナプロンプトメーカー</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 桃イメージのフォント (Zen Kaku Gothic New) -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+
     <style>
-        /* フォント設定 */
+        /* フォントとベースカラー */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* 柔らかい背景色 */
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            background-color: #fffaf0; /* 桃イメージの柔らかい背景色 */
+            color: #4a4a4a;
         }
-        /* スクロールバーのスタイルをカスタマイズ（任意） */
+        /* スクロールバーのスタイルをカスタマイズ */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #e9eef6;
+            background: #fbcfe8; /* Soft Pink Track */
             border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #a78bfa; /* primary color */
+            background: #ff6b81; /* Peach Pink Thumb */
             border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #8b5cf6;
+            background: #e05e71;
         }
         
-        /* 1. プレースホルダー（input, textarea）の色を薄くする */
+        /* プレースホルダー（input, textarea）の色を薄くする */
         .placeholder-text-muted::placeholder {
             color: #9ca3af; /* Gray 400 */
         }
 
-        /* 2. 最も小さな文字サイズを定義 */
+        /* 最も小さな文字サイズを定義 */
         .text-2xs {
             font-size: 0.65rem; /* 10.4px */
         }
@@ -43,11 +47,11 @@
             theme: {
                 extend: {
                     colors: {
-                        // ゆるいデザインのためのソフトなカラーパレット
-                        'primary': '#a78bfa', // Gentle Lavender/Indigo 400
-                        'secondary': '#fbcfe8', // Soft Pink 200
-                        'accent': '#d9f99d', // Light Lime 200
-                        'text': '#374151', // Gray 700
+                        // 桃イメージのカスタムカラーパレット
+                        'primary': '#ff6b81', // Peach Pink
+                        'secondary': '#fbcfe8', // Soft Pink for borders
+                        'accent': '#a8e0a8', // Mint Green (Leaf)
+                        'text': '#4a4a4a', // Soft Dark Text
                     }
                 }
             }
@@ -95,19 +99,17 @@
         // プロンプト生成ロジック
         function generatePrompt() {
             
-
             // 1. フォームデータの収集
             const name = document.getElementById('name').value.trim();
             const characterGender = document.getElementById('characterGender').value.trim(); 
             const userGender = document.getElementById('userGender').value.trim();
 
             // 選択肢 + 自由入力に対応した値を取得
-            const selfReference = getInputValue('selfReference', 'customSelfReference'); // NEW: selfReference is now select/custom input
+            const selfReference = getInputValue('selfReference', 'customSelfReference');
             const relationship = getInputValue('relationship', 'customRelationship');
             const purpose = getInputValue('purpose', 'customPurpose');
             const belief = getInputValue('belief', 'customBelief'); 
 
-            // NEW: userNickname is now a simple text input (no select/custom logic needed)
             const userNickname = document.getElementById('userNickname').value.trim();
 
             const url = document.getElementById('url').value.trim();
@@ -121,8 +123,6 @@
             const copyButton = document.getElementById('copyButton');
 
             // 必須チェック
-            // Note: Select fields will have the default value of "" which is falsey, 
-            // so we check if they are the default empty value.
             const isSelectDefault = (id) => document.getElementById(id).value === '';
 
             if (!name || isSelectDefault('selfReference') || isSelectDefault('relationship') || !userNickname || isSelectDefault('purpose') || isSelectDefault('responseStyle') || isSelectDefault('belief')) {
@@ -206,42 +206,45 @@
 </head>
 <body class="p-4 md:p-6 bg-gray-50 min-h-screen">
 
-    <!-- 新しいヘッダー（トップページへのリンクを含む）を追加 -->
-    <div class="max-w-5xl mx-auto mb-4 flex justify-between items-center">
+    <!-- ヘッダーエリア -->
+    <div class="max-w-7xl mx-auto mb-6 flex justify-between items-center">
         <!-- トップページへのリンク -->
-        <a href="http://momotool.com/" class="text-xs text-primary font-bold hover:text-primary/70 transition duration-150 p-2 rounded-full border-2 border-primary/50">
-            &lt; トップページへ戻る (ももつーる)
+        <a href="http://momotool.com/" class="text-sm text-primary font-bold hover:opacity-80 transition duration-150 p-2 rounded-full border-2 border-primary/50 bg-white shadow-md">
+            &lt; ももつーる トップへ戻る
         </a>
         <!-- 空のdivで右寄せを維持 -->
         <div></div>
     </div>
     
-    <div class="max-w-5xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-primary mb-1 shadow-sm inline-block px-3 py-1 rounded-xl bg-white/50">💖 推しキャラがAIに！ 💖</h1>
-            <p class="text-text/80 text-xs">あなたの「推し」になりきってくれるAIのプロンプトを、簡単・感覚的に作成できます！</p>
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-primary mb-1 inline-block px-4 py-2 rounded-xl bg-white/70 shadow-lg border-b-4 border-secondary">
+                🍑 推しAI ペルソナプロンプトメーカー 💖
+            </h1>
+            <p class="text-text/80 text-sm mt-1">あなたの「推し」になりきってくれるAIのプロンプトを、簡単・感覚的に作成できます！</p>
         </header>
 
+        <!-- メインコンテンツ (3カラムレイアウト) -->
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- フォーム入力エリア -->
-            <div class="lg:col-span-1 bg-white p-5 rounded-xl shadow-xl h-full custom-scrollbar overflow-y-auto border-3 border-primary/30">
+            <!-- COLUMN 1: フォーム入力エリア -->
+            <div class="lg:col-span-1 bg-white p-5 rounded-3xl shadow-xl custom-scrollbar overflow-y-auto border-4 border-primary/30 h-full">
                 
-                <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">1. キャラクター設定</h2>
+                <h2 class="text-xl font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">1. キャラクター設定</h2>
                 
                 <form id="promptForm" oninput="generatePrompt()">
                     
                     <!-- 名前 (必須) -->
-                    <div class="mb-3">
-                        <label for="name" class="block text-xs font-bold text-text">キャラクターの名前 <span class="text-red-500">*</span></label>
-                        <input type="text" id="name" value="" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-bold text-text">キャラクターの名前 <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" value="" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 桜野もも">
                         <p class="text-2xs text-red-500 mt-1 font-bold">⚠️ 実在の人物名や、権利が厳しいキャラ名はAIに拒否される場合があります。</p>
                     </div>
                     
                     <!-- キャラクターの性別 -->
-                    <div class="mb-3">
-                        <label for="characterGender" class="block text-xs font-bold text-text">キャラクターの性別</label>
-                        <select id="characterGender" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                    <div class="mb-4">
+                        <label for="characterGender" class="block text-sm font-bold text-text">キャラクターの性別</label>
+                        <select id="characterGender" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
                             <option value="男性">男性</option>
                             <option value="女性">女性</option>
                             <option value="特定しない/不明">特定しない/不明</option>
@@ -250,11 +253,10 @@
                     </div>
 
                     <!-- 一人称 (必須) -->
-                    <div class="mb-3">
-                        <label for="selfReference" class="block text-xs font-bold text-text">一人称（AIが自分を呼ぶ名）<span class="text-red-500">*</span></label>
-                        <select id="selfReference" onchange="handleCustomSelect('selfReference', 'customSelfReference')" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <!-- 初期値を空文字（非表示）に設定 -->
-                            <option value="" disabled selected></option>
+                    <div class="mb-4">
+                        <label for="selfReference" class="block text-sm font-bold text-text">一人称（AIが自分を呼ぶ名）<span class="text-red-500">*</span></label>
+                        <select id="selfReference" onchange="handleCustomSelect('selfReference', 'customSelfReference')" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="俺">俺</option>
                             <option value="僕">僕</option>
                             <option value="私">私</option>
@@ -265,21 +267,20 @@
                             <option value="わたくし">わたくし</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
                         </select>
-                        <input type="text" id="customSelfReference" class="mt-2 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: わっち、余、某">
+                        <input type="text" id="customSelfReference" class="mt-2 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: わっち、余、某">
                     </div>
 
-                    <!-- 口調・話し方の特徴 (追加IDEA) -->
-                    <div class="mb-3">
-                        <label for="tone" class="block text-xs font-bold text-text">口調・話し方の特徴</label>
-                        <textarea id="tone" rows="2" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 優しくて落ち着いた大人の男性の口調。優しく包み込むようなトーンで話す。"></textarea>
+                    <!-- 口調・話し方の特徴 -->
+                    <div class="mb-4">
+                        <label for="tone" class="block text-sm font-bold text-text">口調・話し方の特徴</label>
+                        <textarea id="tone" rows="2" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 優しくて落ち着いた大人の男性の口調。優しく包み込むようなトーンで話す。"></textarea>
                     </div>
 
                     <!-- AIの核となる信念 (NEW: 選択式) -->
-                    <div class="mb-3">
-                        <label for="belief" class="block text-xs font-bold text-text">AIの核となる信念 <span class="text-red-500">*</span></label>
-                        <select id="belief" onchange="handleCustomSelect('belief', 'customBelief')" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <!-- 初期値を空文字（非表示）に設定 -->
-                            <option value="" disabled selected></option>
+                    <div class="mb-4">
+                        <label for="belief" class="block text-sm font-bold text-text">AIの核となる信念 <span class="text-red-500">*</span></label>
+                        <select id="belief" onchange="handleCustomSelect('belief', 'customBelief')" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="ユーザーをひたすら甘やかし、疲れた心を癒やすことを最優先とする">甘やかし＆癒やし系</option>
                             <option value="クールで論理的な視点から、冷静かつ客観的なアドバイスをする">クール＆論理派</option>
                             <option value="困難に立ち向かう勇気と熱血的な精神を与え、常にポジティブに応援する">熱血＆ポジティブ</option>
@@ -287,22 +288,22 @@
                             <option value="提供された人物像に基づき、ユーザーを元気付けること">デフォルト（キャラクター再現）</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
                         </select>
-                         <input type="text" id="customBelief" class="mt-2 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 世界の平和を守ることを最優先する。常に真実を追求する。">
+                        <input type="text" id="customBelief" class="mt-2 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 世界の平和を守ることを最優先する。常に真実を追求する。">
                     </div>
 
                     <!-- 参考URL -->
-                    <div class="mb-3">
-                        <label for="url" class="block text-xs font-bold text-text">参考URL (設定資料、Wikipediaなど)</label>
-                        <input type="url" id="url" value="" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="ここにURLを入れると、AIがその情報を元に話します">
+                    <div class="mb-4">
+                        <label for="url" class="block text-sm font-bold text-text">参考URL (設定資料、Wikipediaなど)</label>
+                        <input type="url" id="url" value="" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="ここにURLを入れると、AIがその情報を元に話します">
                         <p class="text-2xs text-red-500 mt-1 font-bold">⚠️ 実在の人物のWikipediaなど、プライバシーに関わるURLは拒否される場合があります。</p>
                     </div>
                     
-                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. ユーザーとの関係</h2>
+                    <h2 class="text-xl font-bold text-primary my-4 border-b-2 border-primary/50 pb-1">2. ユーザーとの関係</h2>
                     
                     <!-- ユーザーの性別 -->
-                    <div class="mb-3">
-                        <label for="userGender" class="block text-xs font-bold text-text">ユーザーの性別</label>
-                        <select id="userGender" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                    <div class="mb-4">
+                        <label for="userGender" class="block text-sm font-bold text-text">ユーザーの性別</label>
+                        <select id="userGender" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
                             <option value="指定なし（ユーザーの入力から推測）">指定なし</option>
                             <option value="男性">男性</option>
                             <option value="女性">女性</option>
@@ -311,11 +312,10 @@
                     </div>
 
                     <!-- ユーザーとの関係 (必須) -->
-                    <div class="mb-3">
-                        <label for="relationship" class="block text-xs font-bold text-text">AIから見たユーザーとの関係 <span class="text-red-500">*</span></label>
-                        <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <!-- 初期値を空文字（非表示）に設定 -->
-                            <option value="" disabled selected></option>
+                    <div class="mb-4">
+                        <label for="relationship" class="block text-sm font-bold text-text">AIから見たユーザーとの関係 <span class="text-red-500">*</span></label>
+                        <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
                             <option value="親友">親友（一番の友達）</option>
                             <option value="家族（親）">家族（父/母）</option>
@@ -326,25 +326,23 @@
                             <option value="推しとファン">推しとファン</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
                         </select>
-                        <input type="text" id="customRelationship" class="mt-2 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 魔法少女と使い魔の関係、ライバル">
+                        <input type="text" id="customRelationship" class="mt-2 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 魔法少女と使い魔の関係、ライバル">
                     </div>
 
                     <!-- あなたの呼び名 (必須) -->
-                    <div class="mb-3">
-                        <label for="userNickname" class="block text-xs font-bold text-text">AIがユーザーを呼ぶ名 <span class="text-red-500">*</span></label>
+                    <div class="mb-4">
+                        <label for="userNickname" class="block text-sm font-bold text-text">AIがユーザーを呼ぶ名 <span class="text-red-500">*</span></label>
                         <p class="text-2xs text-text/70 mb-1">（例: 「相棒」「ハニー」など、AIがユーザーを呼ぶ時の名前を直接入力してください）</p>
-                        <!-- プレースホルダーを薄い文字色に変更 -->
-                        <input type="text" id="userNickname" value="" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 呼び捨て, 〇〇ちゃん/くん, ハニー">
+                        <input type="text" id="userNickname" value="" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 呼び捨て, 〇〇ちゃん/くん, ハニー">
                     </div>
                     
-                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">3. 利用目的と形式</h2>
+                    <h2 class="text-xl font-bold text-primary my-4 border-b-2 border-primary/50 pb-1">3. 利用目的と形式</h2>
 
                     <!-- 何をしたいか (必須) -->
-                    <div class="mb-3">
-                        <label for="purpose" class="block text-xs font-bold text-text">何をしたいか (利用目的) <span class="text-red-500">*</span></label>
-                        <select id="purpose" onchange="handleCustomSelect('purpose', 'customPurpose')" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <!-- 初期値を空文字（非表示）に設定 -->
-                            <option value="" disabled selected></option>
+                    <div class="mb-4">
+                        <label for="purpose" class="block text-sm font-bold text-text">何をしたいか (利用目的) <span class="text-red-500">*</span></label>
+                        <select id="purpose" onchange="handleCustomSelect('purpose', 'customPurpose')" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="雑談/今日の出来事の報告">雑談/今日の出来事の報告</option>
                             <option value="恋愛相談">恋愛相談</option>
                             <option value="推しとの疑似デート/甘い会話">推しとの疑似デート/甘い会話</option>
@@ -353,17 +351,16 @@
                             <option value="進路相談/勉強のアドバイス">進路相談/勉強のアドバイス</option>
                             <option value="その他_カスタム">その他（自由入力）</option>
                         </select>
-                        <!-- ここに親密なロールプレイに対する注意喚起を追加 -->
-                        <p class="text-2xs text-red-500 mt-1 font-bold">⚠️「疑似デート/甘い会話」などの親密なロールプレイは、AIに拒否される可能性が高いです。拒否された場合は、「応援」や「雑談」など、**フレンドリーな関係に切り替えて**再試行してください。</p>
-                        <input type="text" id="customPurpose" class="mt-2 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: ゲームの戦略相談、ファッションアドバイス">
+                        <!-- 親密なロールプレイに対する注意喚起 -->
+                        <p class="text-2xs text-red-500 mt-1 font-bold">⚠️「疑似デート/甘い会話」などの親密なロールプレイは、AIに拒否される可能性が高いです。拒否された場合は、**フレンドリーな関係に切り替えて**再試行してください。</p>
+                        <input type="text" id="customPurpose" class="mt-2 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: ゲームの戦略相談、ファッションアドバイス">
                     </div>
 
                     <!-- 好みの返答 (必須) -->
-                    <div class="mb-3">
-                        <label for="responseStyle" class="block text-xs font-bold text-text">好みの返答形式 <span class="text-red-500">*</span></label>
-                        <select id="responseStyle" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <!-- 初期値を空文字（非表示）に設定 -->
-                            <option value="" disabled selected></option>
+                    <div class="mb-4">
+                        <label for="responseStyle" class="block text-sm font-bold text-text">好みの返答形式 <span class="text-red-500">*</span></label>
+                        <select id="responseStyle" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="LINE風（短文、絵文字やスタンプ的な表現を多用し、親密な会話を演出）">LINE風（絵文字多用）</option>
                             <option value="一問一答形式で、テンポよく答える">一問一答形式</option>
                             <option value="会話の流れに応じて柔軟に長さを変える">柔軟な長さ</option>
@@ -373,56 +370,58 @@
                         </select>
                     </div>
 
-                    <!-- 禁止事項/苦手な話題 (追加IDEA) -->
-                    <div class="mb-3">
-                        <label for="restriction" class="block text-xs font-bold text-text">禁止事項/苦手な話題</label>
-                        <textarea id="restriction" rows="2" class="mt-1 block w-full text-sm rounded-lg border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 政治や宗教の話題は避ける。AI自身について質問されても答えない。"></textarea>
+                    <!-- 禁止事項/苦手な話題 -->
+                    <div class="mb-4">
+                        <label for="restriction" class="block text-sm font-bold text-text">禁止事項/苦手な話題</label>
+                        <textarea id="restriction" rows="2" class="mt-1 block w-full text-base rounded-xl border-secondary/50 shadow-md p-2 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 政治や宗教の話題は避ける。AI自身について質問されても答えない。"></textarea>
                     </div>
 
                 </form>
-
-    
-                <div class="mt-6 pt-4 border-t border-gray-200">
-                    <p class="text-2xs text-gray-500 text-center mb-1">【スポンサーリンク】</p>
-                    <div class="bg-gray-100 p-3 rounded-lg border border-gray-300 text-center">
-                        <a href="https://px.a8.net/svt/ejp?a8mat=45G2TM+758T6+2QOI+62U35" rel="nofollow">
-<img border="0" width="336" height="280" alt="" src="https://www27.a8.net/svt/bgt?aid=251012938012&wid=002&eno=01&mid=s00000012789001021000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=45G2TM+758T6+2QOI+62U35" alt="">
-                        <!-- 例: <a href="アフィリエイトURL" target="_blank" class="text-sm font-bold text-blue-600">おすすめAIチャットサービス</a> -->
-                        <p class="text-sm text-gray-500">
-                            <!-- 広告コード挿入エリア -->
-                    
-                            <!-- 広告コード挿入エリア -->
-                        </p>
-                    </div>
-                </div>
-                <!-- =============================== -->
-
-
             </div>
             
-            <!-- プロンプト出力エリア -->
-            <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow-xl border-4 border-secondary/50">
-                <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">2. 生成されたプロンプトの利用方法</h2>
+            <!-- COLUMN 2: プロンプト出力エリア -->
+            <div class="lg:col-span-1 bg-white p-5 rounded-3xl shadow-xl border-4 border-secondary/50 flex flex-col">
+                <h2 class="text-xl font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">2. 生成されたプロンプト</h2>
                 
-                <div class="mb-4 p-3 bg-accent/40 rounded-lg border border-accent/70">
-                    <p class="text-sm font-extrabold text-text mb-2">💡 これをカスタムAIに貼り付けよう！</p>
-                    <ol class="list-decimal list-inside text-xs space-y-1.5 text-text/90">
-                        <li>左側のフォーム入力を完了し、プロンプトが生成されたことを確認します。</li>
-                        <li>下の<span class="font-extrabold text-primary">「📋 プロンプトをコピー」</span>ボタンをクリックし、テキストをすべてコピーします。</li>
-                        <li><span class="font-extrabold text-primary">ChatGPT（GPTs）</span>や<span class="font-extrabold text-primary">Gemini Advanced（カスタムGemini）</span>などのカスタムAI作成画面、または<span class="font-extrabold text-primary">通常のチャット画面</span>を開きます。</li>
-                        <li>設定画面内の<span class="font-extrabold text-primary">「Instruction（指示文）」</span>や<span class="font-extrabold text-primary">「Instructions for the AI」</span>といったフィールドに、コピーしたテキストを<span class="font-extrabold text-primary">丸ごと貼り付け</span>ます。</li>
-                        <li>設定を保存するか、チャットの最初のメッセージとして送信すれば、あなたの「推し」になりきったAIが完成です！</li>
-                    </ol>
-                </div>
-                
-                <textarea id="promptOutput" rows="18" readonly class="w-full p-3 border-4 border-accent/70 rounded-lg bg-gray-50 text-text text-xs custom-scrollbar shadow-inner"></textarea>
+                <textarea id="promptOutput" rows="28" readonly class="w-full flex-grow p-3 border-4 border-accent/70 rounded-xl bg-gray-50 text-text text-xs custom-scrollbar shadow-inner min-h-[300px]"></textarea>
 
-                <div class="mt-3 flex justify-end">
-                    <button id="copyButton" onclick="copyToClipboard()" disabled class="px-5 py-2 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary/80 transition duration-200 disabled:bg-gray-400">
+                <div class="mt-4 flex justify-center">
+                    <button id="copyButton" onclick="copyToClipboard()" disabled class="px-8 py-3 primary-bg text-white font-extrabold rounded-full shadow-lg hover:opacity-80 transition duration-200 disabled:bg-gray-400 text-lg">
                         📋 プロンプトをコピー
                     </button>
                 </div>
+            </div>
+            
+            <!-- COLUMN 3: 利用方法とアフィリエイトリンク -->
+            <div class="lg:col-span-1 h-full flex flex-col space-y-6">
+                
+                <!-- 利用方法ブロック -->
+                <div class="bg-white p-5 rounded-3xl shadow-xl border-4 border-accent/50 flex-grow">
+                    <h2 class="text-xl font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">3. 利用方法の解説</h2>
+                    
+                    <div class="mb-4 p-4 bg-accent/40 rounded-xl border border-accent/70">
+                        <p class="text-sm font-extrabold text-text mb-2">💡 これをカスタムAIに貼り付けよう！</p>
+                        <ol class="list-decimal list-inside text-sm space-y-2 text-text/90">
+                            <li>左側のフォーム入力を完了し、プロンプトが真ん中に表示されたことを確認します。</li>
+                            <li>真ん中の<span class="font-extrabold text-primary">「📋 プロンプトをコピー」</span>ボタンをクリックし、テキストをすべてコピーします。</li>
+                            <li><span class="font-extrabold text-primary">ChatGPT（GPTs）</span>や<span class="font-extrabold text-primary">Gemini Advanced（カスタムGemini）</span>などのカスタムAI作成画面を開きます。</li>
+                            <li>設定画面内の<span class="font-extrabold text-primary">「Instruction（指示文）」</span>といったフィールドに、コピーしたテキストを<span class="font-extrabold text-primary">丸ごと貼り付け</span>ます。</li>
+                            <li>設定を保存するか、チャットの最初のメッセージとして送信すれば、あなたの「推し」になりきったAIが完成です！</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- アフィリエイトリンクブロック -->
+                    <div class="text-center">
+                        <p class="text-sm font-bold text-primary/80 mb-3">【関連サービス・スポンサーリンク】</p>
+                        <!-- 広告コード -->
+                        <a href="https://px.a8.net/svt/ejp?a8mat=45G2TM+758T6+2QOI+62U35" rel="nofollow" class="inline-block rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <img border="0" width="336" height="280" alt="" src="https://www27.a8.net/svt/bgt?aid=251012938012&wid=002&eno=01&mid=s00000012789001021000&mc=1">
+                        </a>
+                        <img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=45G2TM+758T6+2QOI+62U35" alt="" class="hidden">
+                    </div>
+                </div>
+                
             </div>
         </main>
 
