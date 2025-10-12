@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ももつーる - あなたの活動を加速する便利ツール集</title>
+    <!-- ✅ SEO対策: タイトルタグの強化 -->
+    <title>ももつーる - 推し活・趣味・業務を加速する便利ツール集</title>
+    <!-- ✅ SEO対策: メタディスクリプションの追加 -->
+    <meta name="description" content="ももつーるは、AIプロンプトメーカーなどの便利ツールを提供するサイトです。あなたのクリエイティブ活動や日常業務をかわいくサポートします。">
     <!-- Tailwind CSS CDN --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: M PLUS Rounded 1c (丸みのあるフォント) --><link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- 変更: Google Fonts: M PLUS Rounded 1c (可愛らしい丸みのあるフォント) -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* フォントとベースカラー */
         body {
-            font-family: 'M PLUS Rounded 1c', sans-serif; /* 丸みのあるフォント */
+            font-family: 'M PLUS Rounded 1c', sans-serif; /* M PLUS Rounded 1c を適用 */
             background-color: #fffaf0; /* 非常に明るいクリーム色 (桃の産毛のようなイメージ) */
             color: #4a4a4a; /* 少し柔らかい黒色 */
         }
@@ -62,9 +66,7 @@
 
     <!-- ヘッダー -->
     <header class="primary-bg text-white shadow-xl">
-        <!-- 修正: p-4 md:p-6 を py-3 px-4 md:py-4 md:px-6 に変更し、上下の余白を削減 -->
         <div class="max-w-6xl mx-auto py-3 px-4 md:py-4 md:px-6 flex justify-between items-center">
-            <!-- 修正: whitespace-nowrap を追加し、改行を防止 -->
             <h1 class="text-3xl font-extrabold tracking-tight whitespace-nowrap">ももつーる</h1>
             <nav>
                 <a href="#tools" class="text-white hover:text-accent-bg transition duration-150 text-lg font-medium">ツール一覧</a>
@@ -73,13 +75,15 @@
     </header>
 
     <!-- ヒーローセクション -->
-    <section class="text-center py-16 md:py-24 bg-white shadow-lg mb-12 card-rounded">
+    <!-- 修正: py-16 md:py-24 を py-12 md:py-20 に微調整 -->
+    <section class="text-center py-12 md:py-20 bg-white shadow-lg mb-12 card-rounded">
         <div class="max-w-4xl mx-auto px-4">
-            <!-- ✅ 修正箇所: whitespace-nowrap を追加し、<br>タグを削除して改行を完全に防ぎました -->
+            <!-- 修正: text-4xl md:text-5xl を維持しつつ、フォント変更により可愛らしく -->
             <h2 class="text-4xl md:text-5xl font-extrabold mb-4 primary-text whitespace-nowrap">
                 <span class="text-5xl md:text-6xl">🍑</span> あなたの活動を加速する便利ツール集
             </h2>
-            <p class="text-xl text-gray-600 mb-8">
+            <!-- 修正: text-xl を text-lg に変更し、可愛らしく -->
+            <p class="text-lg text-gray-600 mb-8">
                 業務、趣味、クリエイティブ活動をサポートする、便利なツールをご紹介します。
             </p>
             <a href="#tools" class="inline-block px-8 py-3 text-lg font-bold text-white primary-bg btn-primary">
@@ -95,12 +99,14 @@
 
         <!-- アフィリエイトバナー --><div class="affiliate-banner-wrapper">
             <a href="https://px.a8.net/svt/ejp?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" rel="nofollow" class="affiliate-banner-pc">
-                <img border="0" width="728" height="90" alt="関連AIサービス" src="https://www24.a8.net/svt/bgt?aid=210206129614&wid=002&eno=01&mid=s00000008903001070000&mc=1">
+                <!-- ✅ SEO対策: alt属性を追加 -->
+                <img border="0" width="728" height="90" alt="関連AIサービスやプログラミング教材" src="https://www24.a8.net/svt/bgt?aid=210206129614&wid=002&eno=01&mid=s00000008903001070000&mc=1">
             </a>
             <img border="0" width="1" height="1" src="https://www13.a8.net/0.gif?a8mat=3H5G35+A5K6ZE+1WP2+6DC69" alt="" class="hidden">
             
             <!-- モバイル用バナー (PC用が非表示の時に表示) --><a href="https://px.a8.net/svt/ejp?a8mat=45G2TN+805UCA+515E+5ZEMP" rel="nofollow" class="md:hidden inline-block">
-                <img border="0" width="320" height="50" alt="関連AIサービス" src="https://www20.a8.net/svt/bgt?aid=251012939484&wid=002&eno=01&mid=s00000023477001005000&mc=1">
+                <!-- ✅ SEO対策: alt属性を追加 -->
+                <img border="0" width="320" height="50" alt="関連AIサービスやプログラミング教材" src="https://www20.a8.net/svt/bgt?aid=251012939484&wid=002&eno=01&mid=s00000023477001005000&mc=1">
             </a>
             <img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=45G2TN+805UCA+515E+5ZEMP" alt="" class="hidden md:hidden">
         </div>
