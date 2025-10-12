@@ -60,19 +60,24 @@
 </head>
 <body class="text-gray-800">
 
-    <!-- ヘッダー --><header class="primary-bg text-white shadow-xl">
-        <div class="max-w-6xl mx-auto p-4 md:p-6 flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold tracking-tight">ももつーる</h1>
+    <!-- ヘッダー -->
+    <header class="primary-bg text-white shadow-xl">
+        <!-- 修正: p-4 md:p-6 を py-3 px-4 md:py-4 md:px-6 に変更し、上下の余白を削減 -->
+        <div class="max-w-6xl mx-auto py-3 px-4 md:py-4 md:px-6 flex justify-between items-center">
+            <!-- 修正: whitespace-nowrap を追加し、改行を防止 -->
+            <h1 class="text-3xl font-extrabold tracking-tight whitespace-nowrap">ももつーる</h1>
             <nav>
                 <a href="#tools" class="text-white hover:text-accent-bg transition duration-150 text-lg font-medium">ツール一覧</a>
             </nav>
         </div>
     </header>
 
-    <!-- ヒーローセクション --><section class="text-center py-16 md:py-24 bg-white shadow-lg mb-12 card-rounded">
+    <!-- ヒーローセクション -->
+    <section class="text-center py-16 md:py-24 bg-white shadow-lg mb-12 card-rounded">
         <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-4xl md:text-5xl font-extrabold mb-4 primary-text">
-                <span class="text-5xl md:text-6xl">🍑</span> あなたの活動を加速する<br class="md:hidden">便利ツール集
+            <!-- ✅ 修正箇所: whitespace-nowrap を追加し、<br>タグを削除して改行を完全に防ぎました -->
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-4 primary-text whitespace-nowrap">
+                <span class="text-5xl md:text-6xl">🍑</span> あなたの活動を加速する便利ツール集
             </h2>
             <p class="text-xl text-gray-600 mb-8">
                 業務、趣味、クリエイティブ活動をサポートする、便利なツールをご紹介します。
