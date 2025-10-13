@@ -19,6 +19,7 @@
             font-family: 'M PLUS Rounded 1c', sans-serif; /* M PLUS Rounded 1c に変更 */
             background-color: #fffaf0; /* 桃イメージの柔らかい背景色 */
             color: #4a4a4a;
+            overflow-x: hidden; /* モバイルでの横スクロール防止 */
         }
         /* スクロールバーのスタイルをカスタマイズ */
         .custom-scrollbar::-webkit-scrollbar {
@@ -84,8 +85,7 @@
                 customInputElement.classList.add('hidden');
                 customInputElement.required = false;
             }
-            // セレクトボックスの値が変わったら、プロンプトを再生成 (自動生成を維持)
-            generatePrompt();
+            // ボタン押下での生成に統一
         }
 
         // Helper function to get the actual value (select or custom input)
@@ -103,11 +103,11 @@
             }
             
             // 通常の選択肢の場合は、その値を使う
-            return select.value.trim(); 
+            return select.value.trim();  
         }
 
 
-        // プロンプト生成ロジック
+        // プロンプト生成ロジック (ボタン押下時のみ実行)
         function generatePrompt() {
             
             // 1. フォームデータの収集
@@ -132,16 +132,27 @@
 
             const outputElement = document.getElementById('promptOutput');
             const copyButton = document.getElementById('copyButton');
-            const generateButton = document.getElementById('generateButton'); // 追加
+            const generateButton = document.getElementById('generateButton');
 
-            // 必須チェック
+
+            // 必須チェックと不足項目リストの作成
+            let missingFields = [];
             const isSelectDefault = (id) => document.getElementById(id).value === '';
 
-            if (!name || isSelectDefault('selfReference') || isSelectDefault('relationship') || !userNickname || isSelectDefault('purpose') || isSelectDefault('responseStyle') || isSelectDefault('belief')) {
-                // エラーメッセージを修正
-                outputElement.value = "🚨 【プロンプトが出ない場合】\n\n「*印」のついた必須項目（特に一人称、関係、利用目的、信念、返答形式のドロップダウン）が、選択されていません。\n\n必ず選択肢を一つ選ぶか、「その他（自由入力）」を選んでテキストを入力してください。";
+            if (!name) missingFields.push("キャラクターの名前");
+            if (isSelectDefault('selfReference') && document.getElementById('customSelfReference').value.trim() === '') missingFields.push("一人称");
+            if (isSelectDefault('relationship') && document.getElementById('customRelationship').value.trim() === '') missingFields.push("あなたとの関係");
+            if (!userNickname) missingFields.push("あなたを呼ぶ名");
+            if (isSelectDefault('purpose') && document.getElementById('customPurpose').value.trim() === '') missingFields.push("利用目的");
+            if (isSelectDefault('responseStyle')) missingFields.push("好みの返答形式");
+            if (isSelectDefault('belief') && document.getElementById('customBelief').value.trim() === '') missingFields.push("核となる信念");
+
+            if (missingFields.length > 0) {
+                // エラーメッセージの表示
+                const errorMessage = "🚨 【プロンプト生成エラー】\n\n以下の必須項目が不足しています。すべて入力・選択してから、再度ボタンを押してください。\n\n- " + missingFields.join('\n- ');
+                outputElement.value = errorMessage;
                 copyButton.disabled = true;
-                generateButton.disabled = true; // 追加
+                generateButton.disabled = false;
                 return;
             }
 
@@ -165,11 +176,11 @@
             prompt += "\n";
 
             // 2.2. ユーザー情報と役割
-            prompt += `## 2. あなたとの関係\n`; // 修正
-            prompt += `- **あなたの推定性別**: ${userGender}\n`; // 修正
+            prompt += `## 2. あなたとの関係\n`;
+            prompt += `- **あなたの推定性別**: ${userGender}\n`; 
             prompt += `- **AIから見たあなたとの関係**: ${name}にとってあなたは「${relationship}」です。\n`;
-            prompt += `- **あなたを呼ぶ名**: あなたを「${userNickname}」と呼んでください。\n`; // 修正
-            prompt += `- **AIの主な役割**: ユーザーが「${purpose}」という目的を達成するためのサポート役として、常にそのペルソナと役割を維持してください。\n`;
+            prompt += `- **あなたを呼ぶ名**: あなたを「${userNickname}」と呼んでください。\n`;
+            prompt += `- **AIの主な役割**: あなたが「${purpose}」という目的を達成するためのサポート役として、常にそのペルソナと役割を維持してください。\n`;
             prompt += "\n";
 
             // 2.3. 回答形式とルールの指示
@@ -182,7 +193,7 @@
             
             prompt += `- **基本ルール**: \n`;
             prompt += `  - 必ず「${selfReference}」を使って話してください。\n`;
-            prompt += `  - あなたのことは「${userNickname}」と呼んでください。\n`; // 修正
+            prompt += `  - あなたのことは「${userNickname}」と呼んでください。\n`;
             prompt += `  - 回答の長さや形式は、「${responseStyle}」を厳密に維持してください。\n`;
             prompt += `  - ${name}が言いそうな言葉、行動、知識に基づいて返答してください。\n`;
             
@@ -194,7 +205,7 @@
             // 3. 結果の表示
             outputElement.value = prompt;
             copyButton.disabled = false;
-            generateButton.disabled = false; // 追加
+            generateButton.disabled = false;
 
             // コピーボタンのテキストをリセット
             copyButton.textContent = '📋 プロンプトをコピー';
@@ -215,7 +226,7 @@
             }, 3000);
         }
 
-        // フォームのリセットと初期プロンプト生成
+        // フォームのリセットと初期メッセージ表示
         function resetForm() {
             document.getElementById('promptForm').reset();
             // カスタム入力欄を非表示に戻す
@@ -223,15 +234,18 @@
             document.getElementById('customRelationship').classList.add('hidden');
             document.getElementById('customPurpose').classList.add('hidden');
             document.getElementById('customBelief').classList.add('hidden');
-            // リセット後、初期プロンプトを再生成
-            generatePrompt();
+            
+            // リセット後、初期メッセージを表示
+            document.getElementById('promptOutput').value = "👋 画面左側のフォームに推しキャラのペルソナ情報を入力し、「✏️ プロンプトを作成」ボタンを押すと、AIにコピペするだけで使えるプロンプトがここに生成されます。";
+            document.getElementById('copyButton').disabled = true;
+            document.getElementById('generateButton').disabled = false; // ボタンは有効に
         }
 
-        // 初期化時にプロンプトを生成
-        window.onload = generatePrompt;
+        // 初期化時に初期メッセージを表示
+        window.onload = resetForm;
     </script>
 </head>
-<body class="p-4 md:p-6 bg-gray-50 min-h-screen">
+<body class="p-4 md:p-6 bg-gray-50 min-h-screen overflow-x-hidden">
 
     <!-- ヘッダーエリア -->
     <div class="max-w-7xl mx-auto mb-3 flex justify-between items-center">
@@ -258,12 +272,12 @@
             
             <!-- COLUMN 1: フォーム入力エリア (3/10幅) -->
             <!-- card-extra-rounded を適用し、p-5をp-4に削減 -->
-            <!-- モバイルでは縦に積む (col-span-10), PCでは 3/10 (lg:col-span-3) -->
             <div class="lg:col-span-3 bg-white p-4 card-extra-rounded shadow-xl custom-scrollbar overflow-y-auto border-4 border-primary/30 h-full">
                 
                 <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">1. キャラクター設定</h2>
                 
-                <form id="promptForm" oninput="generatePrompt()">
+                <!-- oninputを削除し、ボタンでのみ生成されるように変更 -->
+                <form id="promptForm">
                     
                     <!-- 名前 (必須) -->
                     <div class="mb-3">
@@ -345,35 +359,31 @@
                     
                     <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. あなたとの関係</h2>
                     
-                    <!-- ユーザーの性別 -->
+                    <!-- あなたの性別 -->
                     <div class="mb-3">
                         <!-- text-sm を text-xs に変更 -->
-                        <label for="userGender" class="block text-xs font-bold text-text">あなたの性別</label>
+                        <label for="userGender" class="block text-xs font-bold text-text">あなたの推定性別</label>
                         <!-- text-base を text-sm に変更し、p-2をp-1.5に削減 -->
                         <select id="userGender" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
-                            <option value="指定なし（ユーザーの入力から推測）">指定なし</option>
+                            <option value="指定なし（あなたの入力から推測）">指定なし</option>
                             <option value="男性">男性</option>
                             <option value="女性">女性</option>
                             <option value="その他">その他</option>
                         </select>
                     </div>
 
-                    <!-- ユーザーとの関係 (必須) -->
+                    <!-- あなたとの関係 (必須) -->
                     <div class="mb-3">
                         <!-- text-sm を text-xs に変更 -->
-                        <label for="relationship" class="block text-xs font-bold text-text">あなたとの関係 <span class="text-red-500">*</span></label>
+                        <label for="relationship" class="block text-xs font-bold text-text">AIから見たあなたとの関係 <span class="text-red-500">*</span></label>
                         <!-- text-base を text-sm に変更し、p-2をp-1.5に削減 -->
                         <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
                             <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
                             <option value="親友">親友（一番の友達）</option>
-                            <!-- ✅ 修正: AIがユーザーの親 -> あなたの親 -->
-                            <option value="家族（AIがユーザーの親）">あなたの親</option>
-                            <!-- ✅ 修正: AIがユーザーの兄/姉 -> あなたの兄/姉 -->
-                            <option value="家族（AIがユーザーの兄/姉）">あなたの兄/姉</option>
-                            <!-- ✅ 修正: AIがユーザーの弟/妹 -> あなたの弟/妹 -->
-                            <option value="家族（AIがユーザーの弟/妹）">あなたの弟/妹</option>
-                            <!-- ✅ 修正: 上司 -> あなたの上司 -->
+                            <option value="家族（AIがあなたの親）">あなたの親</option>
+                            <option value="家族（AIがあなたの兄/姉）">あなたの兄/姉</option>
+                            <option value="家族（AIがあなたの弟/妹）">あなたの弟/妹</option>
                             <option value="上司">あなたの上司</option>
                             <option value="幼馴染">幼馴染</option>
                             <option value="推しとファン">推しとファン</option>
@@ -383,11 +393,11 @@
                         <input type="text" id="customRelationship" class="mt-2 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 魔法少女と使い魔の関係、ライバル">
                     </div>
 
-                    <!-- あなたの呼び名 (必須) -->
+                    <!-- あなたを呼ぶ名 (必須) -->
                     <div class="mb-3">
                         <!-- text-sm を text-xs に変更 -->
-                        <label for="userNickname" class="block text-xs font-bold text-text">あなたを呼ぶ名 <span class="text-red-500">*</span></label>
-                        <p class="text-2xs text-text/70 mb-1">（例: 「相棒」「ハニー」など、AIがユーザーを呼ぶ時の名前を直接入力してください）</p>
+                        <label for="userNickname" class="block text-xs font-bold text-text">AIがあなたを呼ぶ名 <span class="text-red-500">*</span></label>
+                        <p class="text-2xs text-text/70 mb-1">（例: 「相棒」「ハニー」など、AIがあなたを呼ぶ時の名前を直接入力してください）</p>
                         <!-- text-base を text-sm に変更し、p-2をp-1.5に削減 -->
                         <input type="text" id="userNickname" value="" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 呼び捨て, 〇〇ちゃん/くん, ハニー">
                     </div>
@@ -427,7 +437,7 @@
                             <option value="会話の流れに応じて柔軟に長さを変える">柔軟な長さ</option>
                             <option value="短文（100字程度）で、要点を簡潔に伝える">短文（要点のみ）</option>
                             <option value="長文（500字程度）で、詳細かつ深く掘り下げる">長文（詳細かつ深く）</option>
-                            <option value="問いかけ式で、ユーザーの思考を促す質問を返す">問いかけ式</option>
+                            <option value="問いかけ式で、あなたの思考を促す質問を返す">問いかけ式</option>
                         </select>
                     </div>
 
@@ -441,22 +451,21 @@
 
                 </form>
 
-                <!-- ✅ 修正箇所: ボタンエリアの追加 -->
+                <!-- ボタンエリア -->
                 <div class="mt-4 flex justify-between space-x-2 pt-4 border-t border-secondary">
                     <!-- リセットボタン -->
                     <button onclick="resetForm()" class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-danger rounded-full shadow-md hover:bg-danger-dark transition duration-200">
                         🔄 入力内容をクリア
                     </button>
                     <!-- プロンプト再生成ボタン -->
-                    <button id="generateButton" onclick="generatePrompt()" disabled class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-primary rounded-full shadow-md hover:opacity-80 transition duration-200 disabled:bg-gray-400">
+                    <button id="generateButton" onclick="generatePrompt()" class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-primary rounded-full shadow-md hover:opacity-80 transition duration-200">
                         ✏️ プロンプトを作成
                     </button>
                 </div>
-                <!-- /修正箇所 -->
             </div>
             
             <!-- COLUMN 2: 利用方法の解説とプロンプト出力エリア (4/10幅) -->
-            <!-- モバイルでは縦に積む (col-span-10), PCでは 4/10 (lg:col-span-4) -->
+            <!-- card-extra-rounded を適用し、p-5をp-4に削減 -->
             <div class="lg:col-span-4 bg-white p-4 card-extra-rounded shadow-xl border-4 border-secondary/50 flex flex-col space-y-3">
                 
                 <!-- 2. 利用方法の解説 (上部へ移動) -->
@@ -465,8 +474,7 @@
                 <div class="p-3 bg-accent/40 rounded-xl border border-accent/70">
                     <p class="text-xs font-extrabold text-text mb-2">💡 これをカスタムAIに貼り付けよう！</p>
                     <ol class="list-decimal list-inside text-xs space-y-1.5 text-text/90">
-                        <!-- ✅ 修正: 表現を汎用的に変更 -->
-                        <li>**フォーム**入力を完了し、プロンプトが**プロンプトエリア**に表示されたことを確認します。</li>
+                        <li>**フォーム**入力を完了し、**「✏️ プロンプトを作成」ボタン**を押すと、プロンプトが**プロンプトエリア**に表示されます。</li>
                         <li>下の<span class="font-extrabold text-primary">「📋 プロンプトをコピー」</span>ボタンをクリックし、テキストをすべてコピーします。</li>
                         <li><span class="font-extrabold text-primary">ChatGPT（GPTs）</span>や<span class="font-extrabold text-primary">Gemini Advanced（カスタムGemini）</span>などのカスタムAI作成画面を開きます。</li>
                         <li>設定画面内の<span class="font-extrabold text-primary">「Instruction（指示文）」</span>といったフィールドに、コピーしたテキストを<span class="font-extrabold text-primary">丸ごと貼り付け</span>ます。</li>
@@ -477,8 +485,8 @@
                 <!-- 3. 生成されたプロンプト (下部へ配置) -->
                 <h2 class="text-lg font-bold text-primary border-b-2 border-primary/50 pb-1 mt-3">3. 生成されたプロンプト</h2>
                 
-                <!-- text-xs を text-2xs に変更し、p-3をp-2に削減 -->
-                <textarea id="promptOutput" rows="18" readonly class="w-full flex-grow p-2 border-4 border-accent/70 rounded-xl bg-gray-50 text-text text-2xs custom-scrollbar shadow-inner min-h-[300px]"></textarea>
+                <!-- text-xs に変更 -->
+                <textarea id="promptOutput" rows="18" readonly class="w-full flex-grow p-2 border-4 border-accent/70 rounded-xl bg-gray-50 text-text text-xs custom-scrollbar shadow-inner min-h-[300px]"></textarea>
 
                 <div class="mt-3 flex justify-center">
                     <!-- text-lg を text-base に変更し、px-8 py-3をpx-6 py-2.5に削減 -->
@@ -488,11 +496,11 @@
                 </div>
             </div>
             
-            <!-- COLUMN 3: アフィリエイトリンクのみ (3/10幅) -->
-            <!-- モバイルでは縦に積む (col-span-10), PCでは 3/10 (lg:col-span-3) -->
+            <!-- COLUMN 3: 公式サイトリンクとアフィリエイトリンク (3/10幅) -->
+            <!-- card-extra-rounded を適用し、p-5をp-4に削減 -->
             <div class="lg:col-span-3 h-full flex flex-col">
                 
-                <!-- ✅ 公式サイトリンクブロック -->
+                <!-- 公式サイトリンクブロック -->
                 <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-accent/50 mb-4">
                     <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-accent/50 pb-1">主要AIサービス 公式サイト</h2>
                     <p class="text-xs text-text/80 mb-4">作成したプロンプトはこちらのサービスでご利用いただけます。</p>
@@ -505,22 +513,44 @@
                         </a>
                     </div>
                 </div>
-                <!-- /公式サイトリンク -->
 
                 <!-- アフィリエイトリンクブロック -->
                 <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-primary/50">
-                    <!-- ✅ 修正: タイトルを削除し、スポンサーリンクの案内のみに -->
-                    <div class="text-center">
-                        <p class="text-xs font-bold text-primary/80 mb-3">【関連サービス・スポンサーリンク】</p>
-                        <!-- 広告コード -->
-<a href="https://px.a8.net/svt/ejp?a8mat=45G2TO+FHBA2+2PEO+661TT" rel="nofollow">
-<img border="0" width="468" height="60" alt="" src="https://www24.a8.net/svt/bgt?aid=251012940026&wid=002&eno=01&mid=s00000012624001036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=45G2TO+FHBA2+2PEO+661TT" alt=""><br>
-                        <a href="https://px.a8.net/svt/ejp?a8mat=45G2TM+758T6+2QOI+62U35" rel="nofollow" class="inline-block rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
-                            <!-- ✅ SEO対策 3: alt属性を追加 -->
-                            <img border="0" width="336" height="280" alt="AIツールの使い方やプロンプト生成を学べるオンライン講座" src="https://www27.a8.net/svt/bgt?aid=251012938012&wid=002&eno=01&mid=s00000012789001021000&mc=1">
-                        </a>
-                        <img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=45G2TM+758T6+2QOI+62U35" alt="" class="hidden">
+                    <div class="text-center space-y-3">
+                        <p class="text-xs font-bold text-primary/80 mb-1">【関連サービス・スポンサーリンク】</p>
+                        
+                        <!-- NEW LINK 1: 240x120 -->
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G2TO+2W6WEY+2PEO+1BS90H" rel="nofollow">
+                                <img border="0" width="240" height="120" alt="旅行予約サイトの広告" src="https://www28.a8.net/svt/bgt?aid=251012940175&wid=002&eno=01&mid=s00000012624008026000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=45G2TO+2W6WEY+2PEO+1BS90H" alt="" class="hidden">
+                        
+                        <!-- NEW LINK 2: 320x100 -->
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G2TO+2V017E+2PEO+C3QQ9" rel="nofollow">
+                                <img border="0" width="320" height="100" alt="AIツールの使い方講座広告" src="https://www26.a8.net/svt/bgt?aid=251012940173&wid=002&eno=01&mid=s00000012624002033000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=45G2TO+2V017E+2PEO+C3QQ9" alt="" class="hidden">
+                        
+                        <!-- NEW LINK 3: 250x250 -->
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G2TM+758T6+2QOI+639IP" rel="nofollow">
+                                <img border="0" width="250" height="250" alt="資格・学習サービス広告" src="https://www27.a8.net/svt/bgt?aid=251012938012&wid=002&eno=01&mid=s00000012789001023000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=45G2TM+758T6+2QOI+639IP" alt="" class="hidden">
+
+                        <!-- NEW LINK 4: 234x60 -->
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G2TN+7VZT3U+2KSK+6HMHT" rel="nofollow">
+                                <img border="0" width="234" height="60" alt="電子書籍・読書サービス広告" src="https://www27.a8.net/svt/bgt?aid=251012939477&wid=002&eno=01&mid=s00000012026001090000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=45G2TN+7VZT3U+2KSK+6HMHT" alt="" class="hidden">
+                        
                     </div>
                 </div>
                 
