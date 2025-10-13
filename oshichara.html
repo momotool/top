@@ -335,7 +335,7 @@
                     <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. あなたとの関係</h2>
                     
                     <div class="mb-3">
-                        <label for="userGender" class="block text-xs font-bold text-text">あなたの推定性別</label>
+                        <label for="userGender" class="block text-xs font-bold text-text">あなたの性別</label>
                         <select id="userGender" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
                             <option value="指定なし（あなたの入力から推測）">指定なし</option>
                             <option value="男性">男性</option>
@@ -345,7 +345,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="relationship" class="block text-xs font-bold text-text">AIから見たあなたとの関係 <span class="text-red-500">*</span></label>
+                        <label for="relationship" class="block text-xs font-bold text-text">あなたとの関係 <span class="text-red-500">*</span></label>
                         <select id="relationship" onchange="handleCustomSelect('relationship', 'customRelationship')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
                             <option value="" disabled selected>選択してください</option>
                             <option value="恋人">恋人</option>
@@ -362,7 +362,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="userNickname" class="block text-xs font-bold text-text">AIがあなたを呼ぶ名 <span class="text-red-500">*</span></label>
+                        <label for="userNickname" class="block text-xs font-bold text-text">あなたの呼び名 <span class="text-red-500">*</span></label>
                         <p class="text-2xs text-text/70 mb-1">（例: 「相棒」「ハニー」など、AIがあなたを呼ぶ時の名前を直接入力してください）</p>
                         <input type="text" id="userNickname" value="" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 呼び捨て, 〇〇ちゃん/くん, ハニー">
                     </div>
