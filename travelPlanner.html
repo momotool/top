@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行プランナー プロンプトメーカー | ChatGPT・Gemini 詳細プラン作成</title>
+    <meta name="description" content="AIに最高の旅行プランを提案させるためのプロンプトを自動生成。目的地、テーマ、予算、移動手段など、詳細な条件を元に実用的なプラン作成指示を作成できます。">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'M PLUS Rounded 1c', sans-serif; background-color: #fffaf0; color: #4a4a4a; overflow-x: hidden; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fbcfe8; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ff6b81; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #e05e71; }
+        .placeholder-text-muted::placeholder { color: #9ca3af; }
+        .text-2xs { font-size: 0.65rem; }
+        .card-extra-rounded { border-radius: 2rem; }
+        .custom-checkbox:checked { background-color: #ff6b81; border-color: #ff6b81; }
+        .primary { background-color: #ff6b81; }
+        .secondary { background-color: #fbcfe8; }
+        .accent { background-color: #a8e0a8; }
+        .danger { background-color: #ef4444; }
+        .danger-dark { background-color: #b91c1c; }
+        .text-primary { color: #ff6b81; }
+        .text-text { color: #4a4a4a; }
+    </style>
+    <script>
+        // Tailwind Config (カラー定義)
+        tailwind.config = { theme: { extend: { colors: { 'primary': '#ff6b81', 'secondary': '#fbcfe8', 'accent': '#a8e0a8', 'text': '#4a4a4a', 'danger': '#ef4444', 'danger-dark': '#b91c1c', } } } }
+
+        // カスタム入力の表示/非表示
+        function handleCustomSelect(selectId, customInputId) {
+            const selectElement = document.getElementById(selectId);
+            const customInputElement = document.getElementById(customInputId);
+            const isCustom = selectElement.value === 'その他_カスタム';
+            if (isCustom) {
+                customInputElement.classList.remove('hidden');
+                customInputElement.required = true;
+                customInputElement.focus();
+            } else {
+                customInputElement.classList.add('hidden');
+                customInputElement.required = false;
+            }
+        }
+        
+        // 旅行期間の入力フィールド切り替え
+        function toggleDurationInput() {
+            const type = document.getElementById('durationType').value;
+            document.getElementById('durationNightsContainer').classList.add('hidden');
+            document.getElementById('durationDatesContainer').classList.add('hidden');
+            if (type === 'nights' || type === 'day_trip') { 
+                document.getElementById('durationNightsContainer').classList.remove('hidden');
+            } else if (type === 'dates') {
+                document.getElementById('durationDatesContainer').classList.remove('hidden');
+            }
+        }
+
+        // 選択値またはカスタム値を取得
+        function getInputValue(selectId, customInputId) {
+            const select = document.getElementById(selectId);
+            const customInput = document.getElementById(customInputId);
+            if (select.value === 'その他_カスタム') {
+                return customInput.value.trim() || '';
+            }
+            return select.value.trim(); 
+        }
+
+        // プロンプト生成ロジック (ボタン押下時のみ実行)
+        function generatePrompt() {
+            const destination = document.getElementById('destination').value.trim();
+            const departure = document.getElementById('departure').value.trim(); 
+            const companionCount = document.getElementById('companionCount').value.trim();
+            const budget = document.getElementById('budget').value.trim();
+            const currency = document.getElementById('currency').value.trim();
+            const budgetType = document.getElementById('budgetType').value.trim();
+            const durationType = document.getElementById('durationType').value.trim();
+            
+            let duration = '';
+            if (durationType === 'nights') {
+                duration = document.getElementById('durationNights').value.trim();
+            } else if (durationType === 'day_trip') { 
+                duration = '日帰り';
+            } else if (durationType === 'dates') {
+                const startDate = document.getElementById('startDate').value.trim();
+                const endDate = document.getElementById('endDate').value.trim();
+                if (startDate && endDate) {
+                    duration = `${startDate} から ${endDate} まで`;
+                }
+            }
+
+            const theme = getInputValue('theme', 'customTheme');
+            const companion = getInputValue('companion', 'customCompanion');
+            const transport = Array.from(document.querySelectorAll('input[name="transport"]:checked')).map(cb => cb.value).join(', ');
+            const requiredElements = document.getElementById('requiredElements').value.trim();
+            const excludeElements = document.getElementById('excludeElements').value.trim();
+            const formatStyle = document.getElementById('formatStyle').value.trim();
+
+            const outputElement = document.getElementById('promptOutput');
+            const copyButton = document.getElementById('copyButton');
+            const generateButton = document.getElementById('generateButton');
+            const isSelectDefault = (id) => document.getElementById(id).value === '';
+
+            // 必須チェックと不足項目リストの作成
+            let missingFields = [];
+            if (!destination) missingFields.push("目的地/エリア");
+            if (!departure) missingFields.push("出発地"); 
+            if (!companionCount || isNaN(parseInt(companionCount)) || parseInt(companionCount) <= 0) missingFields.push("同行人数（1人以上）");
+            
+            if (durationType === 'dates') {
+                if (!document.getElementById('startDate').value.trim()) missingFields.push("旅行期間（出発日）");
+                if (!document.getElementById('endDate').value.trim()) missingFields.push("旅行期間（帰着日）");
+            } else if (durationType === 'nights' && document.getElementById('durationNights').value === '') {
+                missingFields.push("旅行期間（泊数）");
+            }
+
+            if (!budget) missingFields.push("予算金額");
+            if (isSelectDefault('theme')) missingFields.push("旅のテーマ/目的");
+            if (isSelectDefault('companion')) missingFields.push("同行者（種類）");
+            if (!transport) missingFields.push("主な移動手段");
+            if (isSelectDefault('formatStyle')) missingFields.push("提案プランの形式");
+
+
+            if (missingFields.length > 0) {
+                const errorMessage = "🚨 【プロンプト生成エラー】\n\n以下の必須項目が不足しています。すべて入力・選択してから、再度ボタンを押してください。\n\n- " + missingFields.join('\n- ');
+                outputElement.value = errorMessage;
+                copyButton.disabled = true;
+                generateButton.disabled = false;
+                return;
+            }
+
+            // プロンプトテキストの構築
+            let prompt = `# 【パーソナル旅行コンシェルジュAI 設定】\n\n`;
+            prompt += `あなたは、以下の詳細な要望に基づいて、実用的かつ最高の旅行プランを提案する**旅行コンシェルジュ**です。常に旅行のプロフェッショナルとしての視点を維持してください。\n\n`;
+
+            prompt += `## 1. 旅行の基本情報\n`;
+            prompt += `- **出発地**: ${departure}\n`; 
+            prompt += `- **目的地**: ${destination}\n`;
+            prompt += `- **旅行期間**: ${durationType === 'day_trip' ? '日帰り' : duration}\n`;
+            prompt += `- **同行人数**: ${companionCount} 名\n`;
+            prompt += `- **予算（${budgetType}）**: ${budget} ${currency}\n`;
+            prompt += `- **同行者**: ${companion}\n`;
+            prompt += `- **主な移動手段**: ${transport}\n\n`;
+
+            prompt += `## 2. 旅行テーマと要望\n`;
+            prompt += `- **旅のテーマ**: ${theme}\n`;
+            
+            if (requiredElements) {
+                prompt += `- **必須要素/訪問地 (必ず含める)**: \n`;
+                requiredElements.split('\n').forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed) prompt += `  - ${trimmed}\n`;
+                });
+            } else {
+                prompt += `- **必須要素/訪問地**: 特に指定なし。テーマに沿って自由に提案してください。\n`;
+            }
+            
+            if (excludeElements) {
+                prompt += `- **避けるべき要素/制限 (絶対に含めない)**: \n`;
+                excludeElements.split('\n').forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed) prompt += `  - ${trimmed}\n`;
+                });
+            } else {
+                prompt += `- **避けるべき要素/制限**: 特に指定なし。\n`;
+            }
+            
+            prompt += "\n";
+
+            prompt += `## 3. プランの形式とルール\n`;
+            prompt += `- **提案形式**: ${formatStyle}\n`;
+            prompt += `- **出力ルール**: \n`;
+            prompt += `  - 提案する施設名や場所は必ず**具体的な名称**を含めること。\n`;
+            prompt += `  - プランは必ず**「〇日目」**の形式で詳細な時間軸を含めること。\n`;
+            prompt += `  - 提案理由や補足情報があれば追記してください。\n\n`;
+            prompt += `上記に基づき、最初の旅行プランを提案してください。`;
+
+
+            outputElement.value = prompt;
+            copyButton.disabled = false;
+            generateButton.disabled = false;
+            copyButton.textContent = '📋 プロンプトをコピー';
+        }
+
+        // クリップボードへのコピー
+        function copyToClipboard() {
+            const outputElement = document.getElementById('promptOutput');
+            outputElement.select();
+            document.execCommand('copy');
+            const copyButton = document.getElementById('copyButton');
+            copyButton.textContent = '✅ コピーしました！';
+            setTimeout(() => { copyButton.textContent = '📋 プロンプトをコピー'; }, 3000);
+        }
+
+        // フォームのリセットと初期プロンプト生成
+        function resetForm() {
+            document.getElementById('promptForm').reset();
+            document.getElementById('customTheme').classList.add('hidden');
+            document.getElementById('customCompanion').classList.add('hidden');
+            
+            document.getElementById('durationType').value = 'nights';
+            document.getElementById('durationNightsContainer').classList.remove('hidden');
+            document.getElementById('durationDatesContainer').classList.add('hidden');
+            
+            document.getElementById('promptOutput').value = "👋 画面左側のフォームに旅行の条件を入力し、「✏️ プランナープロンプトを作成」ボタンを押すと、AIにコピペするだけで使えるプロンプトがここに生成されます。";
+            document.getElementById('copyButton').disabled = true;
+            document.getElementById('generateButton').disabled = false;
+        }
+
+        window.onload = () => { resetForm(); toggleDurationInput(); };
+    </script>
+</head>
+<body class="p-4 md:p-6 bg-gray-50 min-h-screen overflow-x-hidden">
+
+    <div class="max-w-7xl mx-auto mb-3 flex justify-between items-center">
+        <a href="http://momotool.com/" class="text-xs text-primary font-bold hover:opacity-80 transition duration-150 p-2 rounded-full border-2 border-primary/50 bg-white shadow-md">
+            &lt; ももつーる トップへ戻る
+        </a>
+        <div></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-4">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-primary mb-1 inline-block px-4 py-1.5 rounded-xl bg-white/70 shadow-lg border-b-4 border-secondary whitespace-nowrap">
+                ✈️ わたしだけの旅行プランナー プロンプトメーカー ✨
+            </h1>
+            <p class="text-text/80 text-xs mt-1">AIに「最高の旅行コンシェルジュ」として振る舞わせるための、詳細なプランニング指示を作成します。</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-10 gap-4">
+            
+            <div class="lg:col-span-3 bg-white p-4 card-extra-rounded shadow-xl custom-scrollbar overflow-y-auto border-4 border-primary/30 h-full">
+                
+                <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-primary/50 pb-1">1. 基本条件設定</h2>
+                
+                <form id="promptForm">
+                    
+                    <div class="mb-3">
+                        <label for="departure" class="block text-xs font-bold text-text">出発地 <span class="text-red-500">*</span></label>
+                        <input type="text" id="departure" value="" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 東京駅、自宅の住所、〇〇空港">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="destination" class="block text-xs font-bold text-text">目的地/エリア <span class="text-red-500">*</span></label>
+                        <input type="text" id="destination" value="" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 北海道 札幌・小樽エリア、イタリア トスカーナ地方">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="companionCount" class="block text-xs font-bold text-text">同行人数（あなたを含む）<span class="text-red-500">*</span></label>
+                        <input type="number" id="companionCount" value="1" min="1" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 1">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="durationType" class="block text-xs font-bold text-text">旅行期間 <span class="text-red-500">*</span></label>
+                        <select id="durationType" onchange="toggleDurationInput()" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="nights" selected>泊数で指定</option>
+                            <option value="day_trip">日帰り</option>
+                            <option value="dates">日程（日付）で指定</option>
+                        </select>
+                        
+                        <div id="durationNightsContainer" class="mt-2">
+                             <select id="durationNights" class="block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                                <option value="" disabled selected>泊数を選択</option>
+                                <option value="1泊2日">1泊2日</option>
+                                <option value="2泊3日">2泊3日</option>
+                                <option value="3泊4日">3泊4日</option>
+                                <option value="4泊5日">4泊5日</option>
+                                <option value="5泊6日以上">5泊6日以上</option>
+                            </select>
+                        </div>
+
+                        <div id="durationDatesContainer" class="mt-2 hidden space-y-2">
+                            <label for="startDate" class="block text-2xs font-bold text-text/70 mb-0.5">出発日</label>
+                            <input type="date" id="startDate" class="block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted">
+                            
+                            <label for="endDate" class="block text-2xs font-bold text-text/70 mb-0.5">帰着日</label>
+                            <input type="date" id="endDate" class="block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="budget" class="block text-xs font-bold text-text">予算 <span class="text-red-500">*</span></label>
+                        <div class="flex space-x-2">
+                            <select id="budgetType" class="mt-1 block w-1/3 text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                                <option value="全体">全体</option>
+                                <option value="一人当たり">一人当たり</option>
+                            </select>
+                            <input type="text" id="budget" value="150,000" class="mt-1 block w-1/3 text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 150,000">
+                            <select id="currency" class="mt-1 block w-1/3 text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                                <option value="円">円</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="その他">その他</option>
+                            </select>
+                        </div>
+                         <p class="text-2xs text-text/70 mt-1">※ 飛行機代や宿泊費など、含める費用の種類は「必須要素」に記入してください。</p>
+                    </div>
+
+                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">2. テーマと移動手段</h2>
+                    
+                    <div class="mb-3">
+                        <label for="theme" class="block text-xs font-bold text-text">旅のテーマ/目的 <span class="text-red-500">*</span></label>
+                        <select id="theme" onchange="handleCustomSelect('theme', 'customTheme')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="現地の美食を巡る、グルメ探訪">グルメ探訪</option>
+                            <option value="美術館や史跡を訪れる、歴史・文化探訪">歴史・文化探訪</option>
+                            <option value="自然の絶景をメインに巡る、絶景/リフレッシュ">絶景/リフレッシュ</option>
+                            <option value="SNSで話題の場所や映えるカフェ巡り">SNS映え・カフェ巡り</option>
+                            <option value="Vlogや動画撮影に最適な場所を巡る">Vlog・動画撮影</option>
+                            <option value="推しの聖地巡礼">推しの聖地巡礼</option>
+                            <option value="旅先で仕事をしつつ観光も楽しむ、ワーケーション">ワーケーション</option>
+                            <option value="アクティビティや体験を重視する、体験型">体験型（アクティビティ）</option>
+                            <option value="その他_カスタム">その他（自由入力）</option>
+                        </select>
+                        <input type="text" id="customTheme" class="mt-2 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 聖地巡礼、秘湯巡り">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="companion" class="block text-xs font-bold text-text">同行者（種類） <span class="text-red-500">*</span></label>
+                        <select id="companion" onchange="handleCustomSelect('companion', 'customCompanion')" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="一人旅">一人旅</option>
+                            <option value="恋人/パートナー">恋人/パートナー</option>
+                            <option value="友人">友人</option>
+                            <option value="家族（乳幼児がいる）">家族（乳幼児連れ）</option>
+                            <option value="家族（高齢者がいる）">家族（高齢者連れ）</option>
+                            <option value="その他_カスタム">その他（自由入力）</option>
+                        </select>
+                         <input type="text" id="customCompanion" class="mt-2 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary hidden placeholder-text-muted" placeholder="例: 団体旅行、ペット">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-text">主な移動手段 <span class="text-red-500">*</span></label>
+                        <div class="mt-1 space-y-1">
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" name="transport" value="飛行機/新幹線" class="custom-checkbox w-4 h-4 text-primary rounded border-secondary focus:ring-primary mr-2"> 飛行機/新幹線
+                            </label>
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" name="transport" value="自家用車/レンタカー" class="custom-checkbox w-4 h-4 text-primary rounded border-secondary focus:ring-primary mr-2"> 自家用車/レンタカー（ドライブ重視）
+                            </label>
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" name="transport" value="公共交通機関（電車、バス）" class="custom-checkbox w-4 h-4 text-primary rounded border-secondary focus:ring-primary mr-2"> 公共交通機関（電車、バス）
+                            </label>
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" name="transport" value="現地のタクシーやライドシェア" class="custom-checkbox w-4 h-4 text-primary rounded border-secondary focus:ring-primary mr-2"> 現地のタクシーやライドシェア
+                            </label>
+                            <label class="flex items-center text-sm">
+                                <input type="checkbox" name="transport" value="自転車/徒歩" class="custom-checkbox w-4 h-4 text-primary rounded border-secondary focus:ring-primary mr-2"> 自転車/徒歩
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-lg font-bold text-primary my-3 border-b-2 border-primary/50 pb-1">3. 詳細要望と形式</h2>
+
+                    <div class="mb-3">
+                        <label for="requiredElements" class="block text-xs font-bold text-text">必須要素/訪問地（リスト形式で入力）</label>
+                        <textarea id="requiredElements" rows="3" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例:
+〇〇美術館
+地元の回転寿司（昼食）
+ホテルは温泉付き"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="excludeElements" class="block text-xs font-bold text-text">避けるべき要素/制限（リスト形式で入力）</label>
+                        <textarea id="excludeElements" rows="3" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border focus:ring-primary focus:border-primary placeholder-text-muted" placeholder="例: 
+激しい山登り
+テーマパーク
+ブランド品ショッピング"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="formatStyle" class="block text-xs font-bold text-text">提案プランの形式 <span class="text-red-500">*</span></label>
+                        <select id="formatStyle" class="mt-1 block w-full text-sm rounded-xl border-secondary/50 shadow-md p-1.5 border bg-white focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>選択してください</option>
+                            <option value="詳細な時間軸を含む日程表形式（表形式）">詳細な日程表（表形式）</option>
+                            <option value="ブログ記事のような解説文形式">ブログ記事のような解説文</option>
+                            <option value="写真映えを意識したスポット中心のリスト形式">写真映えスポット中心のリスト</option>
+                        </select>
+                    </div>
+
+                </form>
+
+                <div class="mt-4 flex justify-between space-x-2 pt-4 border-t border-secondary">
+                    <button onclick="resetForm()" class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-danger rounded-full shadow-md hover:bg-danger-dark transition duration-200">
+                        🔄 入力内容をクリア
+                    </button>
+                    <button id="generateButton" onclick="generatePrompt()" class="w-1/2 px-4 py-2 text-sm font-bold text-white bg-primary rounded-full shadow-md hover:opacity-80 transition duration-200">
+                        ✏️ プランナープロンプトを作成
+                    </button>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-4 bg-white p-4 card-extra-rounded shadow-xl border-4 border-secondary/50 flex flex-col space-y-3">
+                
+                <h2 class="text-lg font-bold text-primary border-b-2 border-primary/50 pb-1">2. 利用方法の解説</h2>
+                <div class="p-3 bg-accent/40 rounded-xl border border-accent/70">
+                    <p class="text-xs font-extrabold text-text mb-2">💡 これをAIに貼り付けて旅行プランをゲット！</p>
+                    <ol class="list-decimal list-inside text-xs space-y-1.5 text-text/90">
+                        <li>**フォーム**入力を完了し、**「✏️ プランナープロンプトを作成」ボタン**を押すと、プロンプトが**プロンプトエリア**に表示されます。</li>
+                        <li>下の<span class="font-extrabold text-primary">「📋 プロンプトをコピー」</span>ボタンをクリックし、テキストをすべてコピーします。</li>
+                        <li><span class="font-extrabold text-primary">ChatGPT</span>や<span class="font-extrabold text-primary">Gemini</span>などのAIチャット画面を開きます。</li>
+                        <li>コピーしたテキストを**最初のメッセージとして送信**すれば、AIがあなたの専属旅行プランナーとして詳細な計画を立て始めます。</li>
+                        <li>（上級者向け）GPTsやカスタムGeminiの設定画面にある<span class="font-extrabold text-primary">「Instruction（指示文）」</span>フィールドに貼り付けて、専用プランナーを作ることも可能です。</li>
+                    </ol>
+                </div>
+
+                <h2 class="text-lg font-bold text-primary border-b-2 border-primary/50 pb-1 mt-3">3. 生成されたプロンプト</h2>
+                
+                <textarea id="promptOutput" rows="12" readonly class="w-full flex-grow p-2 border-4 border-accent/70 rounded-xl bg-gray-50 text-text text-xs custom-scrollbar shadow-inner min-h-[250px]"></textarea>
+
+                <div class="mt-3 flex justify-center">
+                    <button id="copyButton" onclick="copyToClipboard()" disabled class="px-6 py-2.5 primary-bg text-white font-extrabold rounded-full shadow-lg hover:opacity-80 transition duration-200 disabled:bg-gray-400 text-base">
+                        📋 プロンプトをコピー
+                    </button>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-3 h-full flex flex-col">
+                
+                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-accent/50 mb-4">
+                    <h2 class="text-lg font-bold text-primary mb-3 border-b-2 border-accent/50 pb-1">主要AIサービス 公式サイト</h2>
+                    <p class="text-xs text-text/80 mb-4">作成したプロンプトはこちらのサービスでご利用いただけます。</p>
+                    <div class="space-y-3">
+                        <a href="https://chat.openai.com/gpts" target="_blank" class="block text-center px-4 py-3 bg-accent text-text font-bold rounded-full shadow-md hover:opacity-80 transition duration-200 text-sm">
+                            🤖 ChatGPT (GPTs) を開く
+                        </a>
+                        <a href="https://gemini.google.com/app" target="_blank" class="block text-center px-4 py-3 bg-accent text-text font-bold rounded-full shadow-md hover:opacity-80 transition duration-200 text-sm">
+                            ✨ Gemini Advanced を開く
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 card-extra-rounded shadow-xl border-4 border-primary/50">
+                    <div class="text-center space-y-3">
+                        <p class="text-xs font-bold text-primary/80 mb-3">【関連サービス・スポンサーリンク】</p>
+                        
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G3LM+7U7IAI+14CS+66H9D" rel="nofollow">
+                                <img border="0" width="234" height="60" alt="旅行予約サービス じゃらんの広告" src="https://www22.a8.net/svt/bgt?aid=251013946474&wid=002&eno=01&mid=s00000005230001038000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=45G3LM+7U7IAI+14CS+66H9D" alt="" class="hidden">
+
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G3LM+7U7IAI+14CS+6HMHT" rel="nofollow">
+                                <img border="0" width="320" height="50" alt="旅行計画・予約サービス広告" src="https://www26.a8.net/svt/bgt?aid=251013946474&wid=002&eno=01&mid=s00000005230001090000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=45G3LM+7U7IAI+14CS+6HMHT" alt="" class="hidden">
+
+                        <div class="flex justify-center">
+                            <a href="https://px.a8.net/svt/ejp?a8mat=45G3LM+8D9DNE+35UM+639IP" rel="nofollow">
+                                <img border="0" width="240" height="90" alt="旅行関連サービス広告" src="https://www29.a8.net/svt/bgt?aid=251013946506&wid=002&eno=01&mid=s00000014755001023000&mc=1">
+                            </a>
+                        </div>
+                        <img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=45G3LM+8D9DNE+35UM+639IP" alt="" class="hidden">
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+
+    </div>
+</body>
+</html>
